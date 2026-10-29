@@ -1,0 +1,11 @@
+{
+  "title": "Solved Games",
+  "description": "This web application enhances user experience in a game by allowing customization of win icons, providing a personalized touch for players.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

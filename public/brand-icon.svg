@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="tileBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181e" />
+      <stop offset="100%" stop-color="#09090c" />
+    </linearGradient>
+    <linearGradient id="stoneGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#ececef" />
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Obsidian Tile -->
+  <rect width="64" height="64" rx="16" fill="url(#tileBg)" />
+  <rect x="1.5" y="1.5" width="61" height="61" rx="14.5" fill="none" stroke="#2d2d38" stroke-width="2" />
+
+  <!-- Single Pure Tournament Game Stone (Unambiguous, Clean, High-Contrast) -->
+  <circle cx="32" cy="32" r="18" fill="url(#stoneGlow)" />
+  <circle cx="32" cy="32" r="12" fill="none" stroke="#a1a1aa" stroke-width="2.5" />
+  <circle cx="32" cy="32" r="4.5" fill="#ffffff" />
+</svg>
