@@ -4,6 +4,8 @@ A website that showcases solved games.
 
 **Live site:** https://solved-games.vercel.app
 
+![Solved Games screenshot](screenshot.png)
+
 ## Games
 
 - Connect 4
