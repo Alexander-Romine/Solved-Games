@@ -19,3 +19,8 @@ logs/
 # beside it.
 /.plugins/
 /.opencode-skills/
+
+# Allow Figma make configuration for builds
+!.figma/
+!.figma/make/
+!.figma/make/site.json
