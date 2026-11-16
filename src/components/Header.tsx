@@ -30,15 +30,14 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header className="relative w-full px-4 sm:px-8 pt-3 pb-2 z-30 select-none">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b-2 border-dashed border-[#bdaea0] pb-3">
+    <header className="w-full px-4 sm:px-8 py-2.5 z-30 select-none bg-[#faf7ef]/95 backdrop-blur-xs border-b-2 border-[#2c241c] shadow-[0_2px_8px_rgba(40,30,20,0.06)]">
+      <div className="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Clean Sketchbook Title */}
         <div className="flex items-center gap-2">
           <div className="relative">
             <span className="text-2xl sm:text-3xl font-['Caveat',cursive] font-bold text-[#2e261f] tracking-wide inline-block transform -rotate-1">
               Solved Games
             </span>
-            
           </div>
         </div>
 
@@ -101,4 +100,3 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-

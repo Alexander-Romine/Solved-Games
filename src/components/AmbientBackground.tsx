@@ -35,7 +35,7 @@ export const AmbientBackground: React.FC = () => {
 
     // Pre-generate background pencil doodles
     const doodles: SketchDoodle[] = [];
-    const count = Math.min(30, Math.floor((width * height) / 35000));
+    const count = Math.min(26, Math.floor((width * height) / 38000));
     const types: SketchDoodle['type'][] = ['arrow', 'cross', 'curly', 'circle', 'tally'];
 
     for (let i = 0; i < count; i++) {
@@ -45,25 +45,21 @@ export const AmbientBackground: React.FC = () => {
         type: types[Math.floor(Math.random() * types.length)],
         size: Math.random() * 18 + 14,
         rotation: (Math.random() - 0.5) * 0.8,
-        alpha: Math.random() * 0.08 + 0.04,
+        alpha: Math.random() * 0.05 + 0.035, // light pencil doodle opacity on paper
       });
     }
 
     const drawDesk = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Warm wooden craft-desk background gradient
-      const woodGrad = ctx.createLinearGradient(0, 0, width, height);
-      woodGrad.addColorStop(0, '#2d2620');
-      woodGrad.addColorStop(0.5, '#26201a');
-      woodGrad.addColorStop(1, '#1f1a15');
-      ctx.fillStyle = woodGrad;
+      // Warm paper background tone
+      ctx.fillStyle = '#faf7ef';
       ctx.fillRect(0, 0, width, height);
 
-      // Subtle cutting-mat / graph grid overlay
-      ctx.strokeStyle = 'rgba(215, 195, 165, 0.035)';
+      // Subtle drafting graph grid across full screen
+      ctx.strokeStyle = 'rgba(160, 180, 205, 0.22)';
       ctx.lineWidth = 1;
-      const gridSize = 40;
+      const gridSize = 36;
       for (let x = 0; x < width; x += gridSize) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -77,12 +73,12 @@ export const AmbientBackground: React.FC = () => {
         ctx.stroke();
       }
 
-      // Draw faint etched doodles across the desk
+      // Draw faint graphite pencil doodles across the paper canvas
       for (const d of doodles) {
         ctx.save();
         ctx.translate(d.x, d.y);
         ctx.rotate(d.rotation);
-        ctx.strokeStyle = `rgba(220, 205, 180, ${d.alpha})`;
+        ctx.strokeStyle = `rgba(50, 40, 30, ${d.alpha})`;
         ctx.lineWidth = 1.2;
         ctx.lineCap = 'round';
 

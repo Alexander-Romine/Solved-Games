@@ -11,7 +11,7 @@
 
 html, body {
   font-family: 'Patrick Hand', var(--font-sans);
-  background-color: #2b2520;
+  background-color: #faf7ef;
   color: #26221c;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -172,3 +172,4 @@ html, body {
 .animate-stamp-slam {
   animation: stampSlam 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.25) forwards;
 }
+

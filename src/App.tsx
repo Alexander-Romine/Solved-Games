@@ -159,116 +159,98 @@ export default function App() {
   const currentIndex = EXHIBIT_GAMES.findIndex(g => g.id === activeGame);
 
   return (
-    <div className="min-h-screen text-[#26221c] flex flex-col items-center justify-start p-2 sm:p-6 lg:p-8 relative overflow-x-hidden font-['Patrick_Hand',cursive]">
-      {/* Background craft desk texture */}
+    <div className="min-h-screen w-full text-[#26221c] flex flex-col bg-[#faf7ef] relative overflow-x-hidden font-['Patrick_Hand',cursive]">
+      {/* Background subtle drafting grid & pencil doodles */}
       <AmbientBackground />
 
-      {/* The Wider Open Sketchbook Folio Container */}
-      <div className="w-full max-w-4xl lg:max-w-5xl bg-[#faf7ef] rounded-2xl border-4 border-[#2c241c] sketchbook-shadow relative flex flex-col my-auto overflow-hidden pb-4">
-        {/* Top Spiral Wire Binding Rings across the wider format */}
-        <div className="w-full bg-[#ede5d5] border-b-2 border-[#2c241c] px-4 py-2 flex items-center justify-between select-none relative">
-          <div className="flex items-center gap-2 sm:gap-3 w-full justify-around">
-            {Array.from({ length: 24 }).map((_, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#2c241c] shadow-inner mb-[-6px] z-10" />
-                <div className="spiral-ring" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#2c241c] shadow-inner mt-[-6px] z-10" />
-              </div>
-            ))}
+      {/* Top Header Bar directly at top of window */}
+      <Header
+        activeGame={activeGame}
+        onSelectGame={setActiveGame}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
+        onOpenInstructions={() => {
+          sounds.playTap();
+          setIsInstructionsOpen(true);
+        }}
+        gameList={EXHIBIT_GAMES}
+      />
+
+      {/* Main Full-Screen Game Canvas */}
+      <main
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-8 py-3 sm:py-6 flex flex-col items-center justify-center relative z-10"
+      >
+        {activeGame === 'checkers' && (
+          <CheckersGame
+            stats={allStats.checkers}
+            onUpdateStats={handleUpdateStats}
+          />
+        )}
+
+        {activeGame === 'connect4' && (
+          <Connect4Game
+            stats={allStats.connect4}
+            onUpdateStats={handleUpdateStats}
+          />
+        )}
+
+        {activeGame === 'mancala' && (
+          <MancalaGame
+            stats={allStats.mancala}
+            onUpdateStats={handleUpdateStats}
+          />
+        )}
+
+        {activeGame === 'nim' && (
+          <NimGame
+            stats={allStats.nim}
+            onUpdateStats={handleUpdateStats}
+          />
+        )}
+
+        {activeGame === 'tictactoe' && (
+          <TicTacToeGame
+            stats={allStats.tictactoe}
+            onUpdateStats={handleUpdateStats}
+          />
+        )}
+
+        {activeGame === 'reversi' && (
+          <ReversiGame
+            stats={allStats.reversi || DEFAULT_STATS}
+            onUpdateStats={handleUpdateStats}
+          />
+        )}
+
+        {/* Hand-drawn Page Flipping Navigation */}
+        <div className="flex items-center justify-between w-full max-w-[520px] mt-4 sm:mt-6 px-2 select-none border-t-2 border-dashed border-[#cfc1b0] pt-3 pb-2">
+          <button
+            onClick={handlePrevGame}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[#2e261f] hover:text-black bg-[#faf6ee] hover:bg-[#efe7d6] border-2 border-[#2e261f] transition-all cursor-pointer shadow-[2px_2px_0px_#2e261f] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none touch-manipulation font-['Patrick_Hand',cursive] text-sm sm:text-base font-bold"
+            title="Previous Game"
+            aria-label="Previous Game"
+          >
+            <ChevronLeft className="w-4 h-4 text-[#8c4233]" />
+            <span>Prev Page</span>
+          </button>
+          
+          <div className="font-['Caveat',cursive] text-lg text-[#6f6354] transform -rotate-1">
+              page {currentIndex + 1} of {EXHIBIT_GAMES.length}  
           </div>
+
+          <button
+            onClick={handleNextGame}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[#2e261f] hover:text-black bg-[#faf6ee] hover:bg-[#efe7d6] border-2 border-[#2e261f] transition-all cursor-pointer shadow-[2px_2px_0px_#2e261f] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none touch-manipulation font-['Patrick_Hand',cursive] text-sm sm:text-base font-bold"
+            title="Next Game"
+            aria-label="Next Game"
+          >
+            <span>Next Page  </span>
+            <ChevronRight className="w-4 h-4 text-[#8c4233]" />
+          </button>
         </div>
-
-        
-
-        {/* Notebook Top Header */}
-        <Header
-          activeGame={activeGame}
-          onSelectGame={setActiveGame}
-          isMuted={isMuted}
-          onToggleMute={handleToggleMute}
-          onOpenInstructions={() => {
-            sounds.playTap();
-            setIsInstructionsOpen(true);
-          }}
-          gameList={EXHIBIT_GAMES}
-        />
-
-        {/* Main Sketchbook Page Canvas */}
-        <main
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          className="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-8 py-3 sm:py-5 flex flex-col items-center justify-center relative"
-        >
-          {activeGame === 'checkers' && (
-            <CheckersGame
-              stats={allStats.checkers}
-              onUpdateStats={handleUpdateStats}
-            />
-          )}
-
-          {activeGame === 'connect4' && (
-            <Connect4Game
-              stats={allStats.connect4}
-              onUpdateStats={handleUpdateStats}
-            />
-          )}
-
-          {activeGame === 'mancala' && (
-            <MancalaGame
-              stats={allStats.mancala}
-              onUpdateStats={handleUpdateStats}
-            />
-          )}
-
-          {activeGame === 'nim' && (
-            <NimGame
-              stats={allStats.nim}
-              onUpdateStats={handleUpdateStats}
-            />
-          )}
-
-          {activeGame === 'tictactoe' && (
-            <TicTacToeGame
-              stats={allStats.tictactoe}
-              onUpdateStats={handleUpdateStats}
-            />
-          )}
-
-          {activeGame === 'reversi' && (
-            <ReversiGame
-              stats={allStats.reversi || DEFAULT_STATS}
-              onUpdateStats={handleUpdateStats}
-            />
-          )}
-
-          {/* Hand-drawn Page Flipping Navigation */}
-          <div className="flex items-center justify-between w-full max-w-[520px] mt-4 px-2 select-none border-t-2 border-dashed border-[#cfc1b0] pt-2.5">
-            <button
-              onClick={handlePrevGame}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[#2e261f] hover:text-black bg-[#faf6ee] hover:bg-[#efe7d6] border-2 border-[#2e261f] transition-all cursor-pointer shadow-[2px_2px_0px_#2e261f] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none touch-manipulation font-['Patrick_Hand',cursive] text-sm sm:text-base font-bold"
-              title="Previous Game"
-              aria-label="Previous Game"
-            >
-              <ChevronLeft className="w-4 h-4 text-[#8c4233]" />
-              <span>← Prev Page</span>
-            </button>
-            
-            <div className="font-['Caveat',cursive] text-lg text-[#6f6354] transform -rotate-1">
-              • page {currentIndex + 1} of {EXHIBIT_GAMES.length} •
-            </div>
-
-            <button
-              onClick={handleNextGame}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[#2e261f] hover:text-black bg-[#faf6ee] hover:bg-[#efe7d6] border-2 border-[#2e261f] transition-all cursor-pointer shadow-[2px_2px_0px_#2e261f] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none touch-manipulation font-['Patrick_Hand',cursive] text-sm sm:text-base font-bold"
-              title="Next Game"
-              aria-label="Next Game"
-            >
-              <span>Next Page →</span>
-              <ChevronRight className="w-4 h-4 text-[#8c4233]" />
-            </button>
-          </div>
-        </main>
-      </div>
+      </main>
 
       {/* Game Rules Modal - Folded Pamphlet */}
       <InstructionsModal
@@ -283,4 +265,3 @@ export default function App() {
     </div>
   );
 }
-
