@@ -1,21 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <defs>
-    <linearGradient id="tileBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#18181e" />
-      <stop offset="100%" stop-color="#09090c" />
-    </linearGradient>
-    <linearGradient id="stoneGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#ececef" />
-    </linearGradient>
-  </defs>
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Hand-drawn Paper Sheet Base -->
+  <rect x="5" y="6" width="54" height="52" rx="8" fill="#FAF6EE" stroke="#2C241C" stroke-width="3.5" />
+  
+  <!-- Spiral Wire Rings at the Top -->
+  <rect x="12" y="2" width="4.5" height="10" rx="2.25" fill="#54483C" stroke="#2C241C" stroke-width="1" />
+  <rect x="23" y="2" width="4.5" height="10" rx="2.25" fill="#54483C" stroke="#2C241C" stroke-width="1" />
+  <rect x="34" y="2" width="4.5" height="10" rx="2.25" fill="#54483C" stroke="#2C241C" stroke-width="1" />
+  <rect x="45" y="2" width="4.5" height="10" rx="2.25" fill="#54483C" stroke="#2C241C" stroke-width="1" />
 
-  <!-- Deep Obsidian Tile -->
-  <rect width="64" height="64" rx="16" fill="url(#tileBg)" />
-  <rect x="1.5" y="1.5" width="61" height="61" rx="14.5" fill="none" stroke="#2d2d38" stroke-width="2" />
+  <!-- Corner Washi Tape Accent -->
+  <polygon points="40,6 59,6 59,24 48,24" fill="#ECD58E" opacity="0.9" />
 
-  <!-- Single Pure Tournament Game Stone (Unambiguous, Clean, High-Contrast) -->
-  <circle cx="32" cy="32" r="18" fill="url(#stoneGlow)" />
-  <circle cx="32" cy="32" r="12" fill="none" stroke="#a1a1aa" stroke-width="2.5" />
-  <circle cx="32" cy="32" r="4.5" fill="#ffffff" />
+  <!-- Hand-sketched Cinnabar X (Left) -->
+  <path d="M 16 26 Q 25 36 33 46" fill="none" stroke="#B83320" stroke-width="5.5" stroke-linecap="round" />
+  <path d="M 33 26 Q 24 36 16 46" fill="none" stroke="#B83320" stroke-width="5.5" stroke-linecap="round" />
+
+  <!-- Hand-sketched Slate Indigo O (Right) -->
+  <ellipse cx="43" cy="38" rx="10" ry="11" fill="none" stroke="#1F4E78" stroke-width="5" stroke-linecap="round" transform="rotate(-6 43 38)" />
 </svg>

@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { GameStats } from '../../types';
-import { GameHeader } from '../../components/GameHeader';
-import { sounds } from '../../utils/sound';
 import {
   ReversiBoard,
   ReversiMove,
@@ -15,17 +13,16 @@ import {
   getBestReversiMove,
   getLegalMoves,
 } from './engine';
+import { sounds } from '../../utils/sound';
+import { GameHeader } from '../../components/GameHeader';
 
 interface ReversiGameProps {
   stats: GameStats;
   onUpdateStats: (result: 'win' | 'loss' | 'draw') => void;
 }
 
-export const ReversiGame: React.FC<ReversiGameProps> = ({
-  stats,
-  onUpdateStats,
-}) => {
-  const [board, setBoard] = useState<ReversiBoard>(() => createInitialBoard());
+export const ReversiGame: React.FC<ReversiGameProps> = ({ stats, onUpdateStats }) => {
+  const [board, setBoard] = useState<ReversiBoard>(createInitialBoard);
   const [currentPlayer, setCurrentPlayer] = useState<ReversiPlayer>('white');
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState<ReversiPlayer | 'tie' | null>(null);
@@ -33,13 +30,8 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({
   const [hoveredMove, setHoveredMove] = useState<ReversiMove | null>(null);
   const [lastPlacedCell, setLastPlacedCell] = useState<{ r: number; c: number } | null>(null);
 
-  // Player is White; Computer is Black
-  const isAiTurn = currentPlayer === 'black' && !gameOver;
-
-  const playerLegalMoves = useMemo(() => {
-    if (gameOver || currentPlayer !== 'white') return [];
-    return getLegalMoves(board, 'white');
-  }, [board, currentPlayer, gameOver]);
+  const isAiTurn = currentPlayer === 'black';
+  const playerLegalMoves = !isAiTurn && !gameOver ? getLegalMoves(board, 'white') : [];
 
   const resetGame = useCallback(() => {
     setBoard(createInitialBoard());
@@ -84,23 +76,19 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({
     const nextLegalMoves = getLegalMoves(nextBoard, nextPlayer);
 
     if (nextLegalMoves.length > 0) {
-      // Normal strict alternating turn
       setCurrentPlayer(nextPlayer);
       setPassNotice(null);
     } else {
-      // Next player has no moves; only then is their turn forced to pass
       const currentCanMoveAgain = getLegalMoves(nextBoard, player);
       if (currentCanMoveAgain.length > 0) {
-        setPassNotice(`${nextPlayer === 'black' ? 'Computer' : 'You'} had no moves • Turn passed`);
-        // Turn stays with the same player
+        setPassNotice(`${nextPlayer === 'black' ? 'Bot' : 'You'} had no moves • Turn passed`);
       } else {
-        // Neither player has legal moves; game over
         finishGame(nextBoard);
       }
     }
   }, [board, finishGame]);
 
-  // AI Turn effect (Computer is Black)
+  // AI Turn effect
   useEffect(() => {
     if (!isAiTurn || gameOver) return;
 
@@ -109,10 +97,9 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({
       if (bestMove) {
         makeMove(bestMove, 'black');
       } else {
-        // AI has no moves
         const humanMoves = getLegalMoves(board, 'white');
         if (humanMoves.length > 0) {
-          setPassNotice('Computer had no moves • Turn passed to you');
+          setPassNotice('Bot had no moves • Turn passed to you');
           setCurrentPlayer('white');
         } else {
           finishGame(board);
@@ -123,12 +110,11 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({
     return () => clearTimeout(timer);
   }, [isAiTurn, gameOver, board, makeMove, finishGame]);
 
-  // Auto-refresh after ~1.2s on loss or draw (Loss is when Computer Black wins)
   useEffect(() => {
     if (gameOver && (winner === 'black' || winner === 'tie')) {
       const timer = setTimeout(() => {
         resetGame();
-      }, 1200);
+      }, 3800);
       return () => clearTimeout(timer);
     }
   }, [gameOver, winner, resetGame]);
@@ -143,13 +129,10 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({
 
   const getStatusText = () => {
     if (gameOver) {
-      if (winner === 'tie') return 'Computer won';
-      return winner === 'white' ? 'You won' : 'Computer won';
+      if (winner === 'tie') return 'Draw Match';
+      return winner === 'white' ? 'You Won!' : 'Bot Won!';
     }
-    if (passNotice) return passNotice;
-    return currentPlayer === 'white'
-      ? 'Your Turn'
-      : 'Thinking...';
+    return '';
   };
 
   const isFlippedByHover = (r: number, c: number) => {
@@ -166,10 +149,12 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({
         onResetGame={resetGame}
       />
 
-      {/* Standardized Box Container (480px) */}
-      <div className="w-[min(340px,calc(100vw-32px))] sm:w-[440px] md:w-[480px] h-[min(340px,calc(100vw-32px))] sm:h-[440px] md:h-[480px] p-2.5 sm:p-4 rounded-3xl bg-[#131319] border border-neutral-700/80 shadow-[0_0_25px_rgba(255,255,255,0.03),0_12px_40px_rgba(0,0,0,0.85)] flex items-center justify-center select-none">
-        {/* Monochrome board chassis */}
-        <div className="w-full h-full p-2 sm:p-2.5 bg-[#181822] border border-neutral-700 rounded-2xl shadow-inner grid grid-cols-8 grid-rows-8 gap-1 sm:gap-1.5 relative">
+      {/* Sketched Graph Paper Reversi Board Container */}
+      <div className="w-[min(340px,calc(100vw-32px))] sm:w-[440px] md:w-[480px] h-[min(340px,calc(100vw-32px))] sm:h-[440px] md:h-[480px] p-2.5 sm:p-4 rounded-xl bg-[#fffdfa] hand-border-thick paper-note-shadow flex items-center justify-center select-none relative">
+        {/* Washi tape strip on top left */}
+        <div className="absolute -top-3 left-10 w-20 h-5 bg-[#a5cde3]/90 transform -rotate-2 shadow-xs border-t border-b border-[#7da9c2]/60 pointer-events-none z-20" />
+
+        <div className="w-full h-full p-2 bg-[#f4ebd9] border-2 border-[#2c241c] rounded-lg shadow-inner grid grid-cols-8 grid-rows-8 gap-1 relative">
           {board.map((row, r) =>
             row.map((cell, c) => {
               const legalMove = playerLegalMoves.find(m => m.row === r && m.col === c);
@@ -177,7 +162,6 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({
               const willFlip = isFlippedByHover(r, c);
               const isLast = lastPlacedCell?.r === r && lastPlacedCell?.c === c;
 
-              // Classic Othello star points at (2,2), (2,5), (5,2), (5,5)
               const isStarPoint = (r === 2 || r === 5) && (c === 2 || c === 5);
 
               return (
@@ -195,44 +179,43 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({
                   disabled={!legalMove || isAiTurn || gameOver}
                   className={`relative rounded-md flex items-center justify-center transition-all touch-manipulation ${
                     cell === null && legalMove && !isAiTurn
-                      ? 'cursor-pointer hover:bg-neutral-700/60 hover:border-neutral-500'
+                      ? 'cursor-pointer hover:bg-[#e8dcce] hover:border-[#b83320]'
                       : 'cursor-default'
-                  } bg-[#23232f] border border-neutral-700/70 shadow-sm`}
+                  } bg-[#eadecc] border border-[#d1c2ad]`}
                   aria-label={`Square ${r + 1}, ${c + 1}`}
                 >
-                  {/* Star point reference dot */}
+                  {/* Star point doodle asterisk */}
                   {isStarPoint && cell === null && !legalMove && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-neutral-500 pointer-events-none" />
+                    <span className="font-mono text-xs font-bold text-[#8a7a6a] pointer-events-none">✦</span>
                   )}
 
-                  {/* Discs */}
+                  {/* Dual-sided Discs */}
                   {cell !== null && (
                     <div
-                      className={`w-[84%] h-[84%] rounded-full transition-transform duration-200 flex items-center justify-center ${
+                      className={`w-[85%] h-[85%] rounded-full transition-transform duration-200 flex items-center justify-center ${
                         cell === 'black'
-                          ? 'bg-gradient-to-br from-neutral-750 via-neutral-900 to-black border-2 border-neutral-400 ring-1 ring-white/30 shadow-[0_3px_8px_rgba(0,0,0,0.9)] text-neutral-300'
-                          : 'bg-gradient-to-br from-white via-neutral-100 to-neutral-200 border-2 border-white ring-1 ring-white/60 shadow-[0_3px_8px_rgba(0,0,0,0.7)] text-neutral-800'
-                      } ${willFlip ? 'scale-105 ring-2 ring-white/90 shadow-[0_0_8px_rgba(255,255,255,0.4)]' : ''} ${
-                        isLast ? 'ring-2 ring-white/80' : ''
+                          ? 'bg-[#2c241c] text-white border-2 border-[#181410] shadow-[1px_2px_0px_rgba(0,0,0,0.5)]'
+                          : 'bg-[#fffdf8] text-[#2c241c] border-2 border-[#2c241c] shadow-[1px_2px_0px_#2c241c]'
+                      } ${willFlip ? 'scale-105 ring-2 ring-[#b83320] shadow-[0_0_8px_rgba(184,51,32,0.5)]' : ''} ${
+                        isLast ? 'ring-2 ring-[#b83320]' : ''
                       }`}
                     >
-                      {/* Subtle concentric disc bevel */}
                       <div
-                        className={`w-[70%] h-[70%] rounded-full border ${
+                        className={`w-[68%] h-[68%] rounded-full border ${
                           cell === 'black'
-                            ? 'border-neutral-500/50 bg-neutral-900/50'
-                            : 'border-neutral-300/60 bg-neutral-200/50'
+                            ? 'border-white/20'
+                            : 'border-black/20'
                         }`}
                       />
                     </div>
                   )}
 
-                  {/* Legal move subtle ghost indicator */}
+                  {/* Legal move red stamp dot */}
                   {cell === null && legalMove && !isAiTurn && (
                     <div className="relative flex items-center justify-center">
-                      <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-white/35 border border-white/50 shadow-[0_0_6px_rgba(255,255,255,0.3)] transition-all group-hover:scale-125" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#b83320] opacity-80" />
                       {isHovered && (
-                        <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold text-white bg-neutral-900 px-1 rounded border border-neutral-700 z-20 pointer-events-none whitespace-nowrap shadow-md">
+                        <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[10px] font-['Patrick_Hand',cursive] font-bold text-white bg-[#b83320] px-1 rounded shadow-md z-20 pointer-events-none whitespace-nowrap">
                           +{legalMove.flipped.length}
                         </span>
                       )}
@@ -247,3 +230,4 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({
     </div>
   );
 };
+

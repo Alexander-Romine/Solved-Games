@@ -1,22 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowDown } from 'lucide-react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { GameStats } from '../../types';
 import {
   Connect4Board,
   Connect4Player,
-  Connect4WinningLine,
+  WinningLine,
 } from './types';
 import {
-  COLS,
-  ROWS,
+  checkConnect4Win,
   createInitialConnect4Board,
   getAvailableRow,
-  checkConnect4Win,
-  isConnect4Full,
   getBestConnect4Move,
+  isConnect4Full,
+  ROWS,
+  COLS,
 } from './engine';
 import { sounds } from '../../utils/sound';
 import { GameHeader } from '../../components/GameHeader';
+import { ArrowDown } from 'lucide-react';
 
 interface Connect4GameProps {
   stats: GameStats;
@@ -26,7 +26,7 @@ interface Connect4GameProps {
 export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats }) => {
   const [board, setBoard] = useState<Connect4Board>(createInitialConnect4Board);
   const [currentPlayer, setCurrentPlayer] = useState<Connect4Player>(1);
-  const [winningLine, setWinningLine] = useState<Connect4WinningLine | null>(null);
+  const [winningLine, setWinningLine] = useState<WinningLine | null>(null);
   const [isDraw, setIsDraw] = useState(false);
   const [hoveredCol, setHoveredCol] = useState<number | null>(null);
   const [lastPlacedCell, setLastPlacedCell] = useState<{ r: number; c: number } | null>(null);
@@ -86,17 +86,17 @@ export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats
     const timer = setTimeout(() => {
       const bestCol = getBestConnect4Move(board);
       dropPiece(bestCol, 2);
-    }, 280);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [currentPlayer, board, winningLine, isDraw, dropPiece]);
 
-  // Auto-refresh after ~1s on loss or draw
+  // Auto-refresh after ~3.8s on loss or draw so the user can inspect the winning 4-in-a-row
   useEffect(() => {
     if ((winningLine && winningLine.player === 2) || isDraw) {
       const timer = setTimeout(() => {
         resetGame();
-      }, 1200);
+      }, 3800);
       return () => clearTimeout(timer);
     }
   }, [winningLine, isDraw, resetGame]);
@@ -117,10 +117,10 @@ export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats
 
   const getStatusText = () => {
     if (winningLine) {
-      return winningLine.player === 1 ? 'You won' : 'Computer won';
+      return winningLine.player === 1 ? 'You Won!' : 'Bot Won!';
     }
-    if (isDraw) return 'Computer won';
-    return currentPlayer === 1 ? 'Your Turn' : 'Thinking...';
+    if (isDraw) return 'Draw (Grid Full)';
+    return '';
   };
 
   return (
@@ -133,10 +133,13 @@ export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats
         onResetGame={resetGame}
       />
 
-      {/* Standardized Box Container (480px) */}
-      <div className="w-[min(340px,calc(100vw-32px))] sm:w-[440px] md:w-[480px] h-[min(340px,calc(100vw-32px))] sm:h-[440px] md:h-[480px] p-2.5 sm:p-4 rounded-3xl bg-[#131319] border border-neutral-700/80 shadow-[0_0_25px_rgba(255,255,255,0.03),0_12px_40px_rgba(0,0,0,0.85)] flex flex-col items-center justify-between select-none">
-        {/* Column Hover Indicator / Drop Buttons Row */}
-        <div className="grid grid-cols-7 gap-1.5 sm:gap-2.5 w-full h-6 px-2 sm:px-3">
+      {/* Cardboard Punch-Grid Chassis */}
+      <div className="w-[min(340px,calc(100vw-32px))] sm:w-[440px] md:w-[480px] h-[min(340px,calc(100vw-32px))] sm:h-[440px] md:h-[480px] p-2.5 sm:p-4 rounded-xl bg-[#fffdfa] hand-border-thick paper-note-shadow flex flex-col items-center justify-between select-none relative">
+        {/* Washi tape on top right */}
+        <div className="absolute -top-3 right-8 w-18 h-5 bg-[#a9d4bd]/90 transform rotate-3 shadow-xs border-t border-b border-[#84b39a]/60 pointer-events-none z-20" />
+
+        {/* Column Drop Indicator Arrow Buttons */}
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-2.5 w-full h-7 px-2 sm:px-3">
           {Array(COLS).fill(0).map((_, c) => {
             const colAvailable = getAvailableRow(board, c) !== -1;
             const isColHovered = hoveredCol === c && !winningLine && !isDraw && currentPlayer === 1 && colAvailable;
@@ -151,20 +154,20 @@ export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats
                 disabled={!canClick}
                 aria-label={`Drop in column ${c + 1}`}
                 className={`flex justify-center items-center h-full rounded-md transition-colors touch-manipulation ${
-                  canClick ? 'cursor-pointer hover:bg-neutral-800/60' : 'cursor-default'
+                  canClick ? 'cursor-pointer hover:bg-[#ebd9bd]/30' : 'cursor-default'
                 }`}
               >
                 {isColHovered && (
-                  <ArrowDown className="w-4 h-4 animate-bounce text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.95)]" />
+                  <ArrowDown className="w-4 h-4 animate-bounce text-[#b83320] drop-shadow-[0_1px_1px_rgba(184,51,32,0.4)]" />
                 )}
               </button>
             );
           })}
         </div>
 
-        {/* Minimalist Matte Dark Chassis */}
+        {/* Thick Cut-out Chipboard Grid */}
         <div
-          className="flex-1 w-full p-2 sm:p-3 rounded-2xl bg-[#1c1c26] border border-neutral-700 shadow-inner flex items-center justify-center relative"
+          className="flex-1 w-full p-2 sm:p-3 rounded-lg bg-[#ede2ce] border-2 border-[#332b23] shadow-inner flex items-center justify-center relative"
           onMouseLeave={() => setHoveredCol(null)}
         >
           <div className="grid grid-cols-7 gap-1.5 sm:gap-2.5 w-full h-full">
@@ -187,9 +190,9 @@ export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats
                     }
                   }}
                   onMouseEnter={() => setHoveredCol(c)}
-                  className={`flex flex-col justify-between h-full rounded-xl p-0.5 transition-colors touch-manipulation ${
+                  className={`flex flex-col justify-between h-full rounded-lg p-0.5 transition-colors touch-manipulation ${
                     canClick
-                      ? 'cursor-pointer hover:bg-neutral-800/40'
+                      ? 'cursor-pointer hover:bg-[#d9cbb2]/60'
                       : 'cursor-default'
                   }`}
                   aria-label={`Column ${c + 1}`}
@@ -203,25 +206,26 @@ export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats
                     return (
                       <div
                         key={`${r}-${c}`}
-                        className="w-full aspect-square rounded-full bg-[#0b0b10] border border-neutral-700/70 shadow-[inset_0_2px_6px_rgba(0,0,0,0.95)] relative flex items-center justify-center overflow-hidden"
+                        className="w-full aspect-square rounded-full bg-[#2a241e] border-2 border-[#1c1813] shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)] relative flex items-center justify-center overflow-hidden"
                       >
-                        {/* Ghost preview disc on hover */}
+                        {/* Ghost disc preview on hover */}
                         {isGhost && (
-                          <div className="w-[88%] h-[88%] rounded-full border-2 border-dashed border-white/60 bg-white/15 animate-pulse pointer-events-none" />
+                          <div className="w-[88%] h-[88%] rounded-full border-2 border-dashed border-[#b83320] bg-[#b83320]/20 animate-pulse pointer-events-none" />
                         )}
 
-                        {/* Placed disc */}
+                        {/* Stamped Felt Marker Token */}
                         {cell !== null && (
                           <div
                             className={`w-[88%] h-[88%] rounded-full shadow-md relative ${
-                              isNewest ? 'animate-c4drop' : 'transition-transform duration-150'
+                              isNewest ? 'animate-c4drop-hand' : 'transition-transform duration-150'
                             } ${
                               cell === 1
-                                ? 'bg-gradient-to-br from-white via-neutral-100 to-neutral-200 ring-2 ring-white/80 shadow-[0_2px_8px_rgba(255,255,255,0.3)]'
-                                : 'bg-gradient-to-br from-neutral-750 via-neutral-900 to-black ring-2 ring-neutral-400 border border-neutral-400/40 shadow-[0_2px_8px_rgba(0,0,0,0.9)]'
-                            } ${isWinningDisc ? 'ring-4 ring-white animate-pulse scale-105' : ''}`}
+                                ? 'bg-[#c23623] border-2 border-[#e67363] text-white shadow-[0_2px_4px_rgba(0,0,0,0.4)]'
+                                : 'bg-[#1f4e78] border-2 border-[#5a8bb8] text-white shadow-[0_2px_4px_rgba(0,0,0,0.4)]'
+                            } ${isWinningDisc ? 'ring-4 ring-[#f59e0b] animate-pulse scale-105' : ''}`}
                           >
-                            <div className="absolute inset-1 rounded-full border border-black/20 pointer-events-none" />
+                            {/* Hand-drawn sketchy white glint */}
+                            <div className="absolute top-1 left-1.5 w-2 h-1 rounded-full bg-white/40 transform -rotate-45 pointer-events-none" />
                           </div>
                         )}
                       </div>
@@ -236,3 +240,4 @@ export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats
     </div>
   );
 };
+

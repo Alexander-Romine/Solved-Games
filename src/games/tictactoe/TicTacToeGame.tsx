@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { GameStats } from '../../types';
 import {
   TTTBoard,
@@ -24,7 +24,7 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
   const [currentPlayer, setCurrentPlayer] = useState<TTTPlayer>('X');
   const [winningLine, setWinningLine] = useState<TTTWinningLine | null>(null);
   const [isDraw, setIsDraw] = useState(false);
-  const [history, setHistory] = useState<{ board: TTTBoard }[]>([]);
+  const [, setHistory] = useState<{ board: TTTBoard }[]>([]);
 
   const isAiTurn = currentPlayer === 'O';
 
@@ -80,17 +80,17 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
     const timer = setTimeout(() => {
       const bestMove = getBestTTTMove(board);
       makeMove(bestMove, 'O');
-    }, 300);
+    }, 320);
 
     return () => clearTimeout(timer);
   }, [currentPlayer, board, winningLine, isDraw, makeMove]);
 
-  // Auto-refresh after ~1s on loss or draw
+  // Auto-refresh after ~3.8s on loss or draw so the user can inspect the final board
   useEffect(() => {
     if ((winningLine && winningLine.winner === 'O') || isDraw) {
       const timer = setTimeout(() => {
         resetGame();
-      }, 1200);
+      }, 3800);
       return () => clearTimeout(timer);
     }
   }, [winningLine, isDraw, resetGame]);
@@ -106,10 +106,10 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
 
   const getStatusText = () => {
     if (winningLine) {
-      return winningLine.winner === 'X' ? 'You won' : 'Computer won';
+      return winningLine.winner === 'X' ? 'You Won!' : 'Bot Won!';
     }
-    if (isDraw) return 'Computer won';
-    return currentPlayer === 'X' ? 'Your Turn' : 'Thinking...';
+    if (isDraw) return 'Cat’s Game (Draw)';
+    return '';
   };
 
   return (
@@ -122,9 +122,19 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
         onResetGame={resetGame}
       />
 
-      {/* Standardized Box Container (480px) */}
-      <div className="w-[min(340px,calc(100vw-32px))] sm:w-[440px] md:w-[480px] h-[min(340px,calc(100vw-32px))] sm:h-[440px] md:h-[480px] p-3 sm:p-4 rounded-3xl bg-[#131319] border border-neutral-700/80 shadow-[0_0_25px_rgba(255,255,255,0.03),0_12px_40px_rgba(0,0,0,0.85)] flex items-center justify-center select-none">
-        <div className="grid grid-cols-3 grid-rows-3 gap-2.5 sm:gap-3 w-full h-full">
+      {/* Sketched Graph Paper Sheet */}
+      <div className="w-[min(340px,calc(100vw-32px))] sm:w-[440px] md:w-[480px] h-[min(340px,calc(100vw-32px))] sm:h-[440px] md:h-[480px] p-4 sm:p-6 bg-[#fffdfa] hand-border-thick paper-note-shadow flex items-center justify-center select-none relative overflow-hidden graph-paper-sketch">
+        {/* Washi tape piece holding top-left corner */}
+        <div className="absolute -top-3 left-6 w-16 h-5 bg-[#ecd58e]/90 transform -rotate-6 shadow-xs border-t border-b border-[#c8b26e]/50 pointer-events-none" />
+
+        {/* Hand-drawn Grid Lines Container */}
+        <div className="grid grid-cols-3 grid-rows-3 gap-0 w-full h-full relative">
+          {/* Subtle hand-drawn dividing lines */}
+          <div className="absolute left-1/3 top-1 bottom-1 w-0.5 bg-[#3a3026] transform -rotate-0.5" />
+          <div className="absolute left-2/3 top-1 bottom-1 w-0.5 bg-[#3a3026] transform rotate-0.5" />
+          <div className="absolute top-1/3 left-1 right-1 h-0.5 bg-[#3a3026] transform rotate-0.5" />
+          <div className="absolute top-2/3 left-1 right-1 h-0.5 bg-[#3a3026] transform -rotate-0.5" />
+
           {board.map((cell, idx) => {
             const isWinner = isWinningCell(idx);
             const isClickable = cell === null && !winningLine && !isDraw && currentPlayer === 'X';
@@ -134,44 +144,45 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
                 key={idx}
                 onClick={() => handleCellClick(idx)}
                 disabled={!isClickable}
-                className={`w-full h-full relative rounded-2xl flex items-center justify-center transition-colors border overflow-hidden touch-manipulation ${
-                  isWinner
-                    ? 'bg-neutral-800 border-white shadow-[0_0_14px_rgba(255,255,255,0.4)]'
-                    : 'bg-[#1c1c26] border-neutral-700/70'
+                className={`w-full h-full relative flex items-center justify-center touch-manipulation z-10 transition-colors ${
+                  isWinner ? 'bg-[#ffeedd]/70' : ''
                 } ${
                   isClickable
-                    ? 'cursor-pointer hover:bg-[#252533] hover:border-neutral-500'
+                    ? 'cursor-pointer hover:bg-[#ebd9bd]/25'
                     : 'cursor-default'
                 }`}
-                aria-label={`Cell ${idx}`}
+                aria-label={`Grid cell ${idx}`}
               >
                 {cell === 'X' && (
                   <svg
-                    className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 aspect-square ${
-                      isWinner ? 'text-white drop-shadow-[0_0_12px_rgba(255,255,255,1)]' : 'text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]'
+                    className={`w-14 h-14 sm:w-20 sm:h-20 aspect-square animate-stamp-slam ${
+                      isWinner ? 'text-[#c0281b] drop-shadow-[0_2px_4px_rgba(192,40,27,0.4)]' : 'text-[#b83320]'
                     }`}
-                    viewBox="0 0 24 24"
+                    viewBox="0 0 100 100"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="3"
+                    strokeWidth="8"
                     strokeLinecap="round"
                   >
-                    <line x1="4" y1="4" x2="20" y2="20" />
-                    <line x1="20" y1="4" x2="4" y2="20" />
+                    {/* Hand-drawn sketchy X with organic curves */}
+                    <path d="M 18,22 Q 48,50 82,78" />
+                    <path d="M 80,24 Q 52,52 18,76" />
                   </svg>
                 )}
 
                 {cell === 'O' && (
                   <svg
-                    className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 aspect-square ${
-                      isWinner ? 'text-white drop-shadow-[0_0_12px_rgba(255,255,255,1)]' : 'text-neutral-200 drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]'
+                    className={`w-14 h-14 sm:w-20 sm:h-20 aspect-square animate-stamp-slam ${
+                      isWinner ? 'text-[#16436e] drop-shadow-[0_2px_4px_rgba(22,67,110,0.4)]' : 'text-[#1f4e78]'
                     }`}
-                    viewBox="0 0 24 24"
+                    viewBox="0 0 100 100"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="3"
+                    strokeWidth="8"
+                    strokeLinecap="round"
                   >
-                    <circle cx="12" cy="12" r="8" />
+                    {/* Hand-drawn sketchy O loop with overlapping tail */}
+                    <path d="M 50,16 C 72,16 86,30 84,54 C 82,76 66,86 48,84 C 28,82 14,68 16,46 C 18,26 34,16 54,16 C 58,16 64,18 68,22" />
                   </svg>
                 )}
               </button>
@@ -182,3 +193,4 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
     </div>
   );
 };
+

@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { X, BookOpen } from 'lucide-react';
+﻿import React, { useEffect } from 'react';
 import { GameId } from '../types';
+import { BookOpen, X, Sparkles } from 'lucide-react';
 import { sounds } from '../utils/sound';
 
 interface InstructionsModalProps {
@@ -10,56 +10,53 @@ interface InstructionsModalProps {
   gameName: string;
 }
 
-interface RuleItem {
-  title: string;
-  description: string;
+interface GameRuleData {
+  subtitle: string;
+  rules: { title: string; description: string }[];
+  tip?: string;
 }
 
-const GAME_RULES: Record<GameId, { subtitle: string; rules: RuleItem[]; tip?: string }> = {
+const GAME_RULES: Record<GameId, GameRuleData> = {
   checkers: {
-    subtitle: 'Classic American Checkers on an 8×8 board',
+    subtitle: 'Classic 8x8 draughts with compulsory capture',
     rules: [
       {
-        title: 'Your Pieces',
-        description: 'You control the White pieces starting at the bottom. The Computer controls the Dark pieces at the top.',
+        title: 'Board & Setup',
+        description: 'You command the Ivory pieces moving forward; the Computer commands the Charcoal pieces moving downward. Only dark squares are used.',
       },
       {
-        title: 'Basic Movement',
-        description: 'Pieces move diagonally forward by one square on the dark tiles only.',
+        title: 'Standard Moves',
+        description: 'Pieces advance diagonally forward one square into an unoccupied dark space.',
       },
       {
-        title: 'Mandatory Jumps',
-        description: 'If you can jump diagonally over an adjacent opponent piece into an empty tile, you MUST capture it. If that same piece can make another jump, you must continue jumping.',
+        title: 'Capturing & Jumps',
+        description: 'Jump diagonally over an adjacent opponent piece into an empty square beyond to capture it. If another jump is available from that position, multi-jumping is mandatory.',
       },
       {
-        title: 'Kings',
-        description: 'Reaching the opposite back row crowns your piece into a King, enabling it to move and jump backwards as well as forward.',
+        title: 'Crowning Kings',
+        description: 'Reaching the opponent’s farthest row crowns your piece as a King, granting both forward and backward diagonal movement.',
       },
       {
-        title: 'Win Condition',
-        description: 'Capture all opponent pieces or leave them with no legal moves.',
+        title: 'Victory Condition',
+        description: 'Capture all opponent pieces or trap them so no legal moves remain to win the match.',
       },
     ],
-    tip: 'Keep your back row intact for as long as possible to prevent the computer from easily crowning kings.',
+    tip: 'Keep your back row intact as long as possible to prevent opponent pieces from earning King status.',
   },
   connect4: {
-    subtitle: 'Vertical 7×6 grid connection game',
+    subtitle: '7-column vertical gravity grid alignment',
     rules: [
       {
-        title: 'Your Turn',
-        description: 'You play White discs; Computer plays Dark discs. Select any column with available space to drop a disc.',
-      },
-      {
-        title: 'Gravity',
-        description: 'Discs always fall to the lowest unoccupied space in the selected column.',
+        title: 'Grid & Turns',
+        description: 'Take turns dropping one token into any of the 7 columns. Gravity causes pieces to slide to the lowest vacant space.',
       },
       {
         title: 'Win Condition',
-        description: 'First player to connect 4 discs in a straight line (horizontally, vertically, or diagonally) wins.',
+        description: 'Be the first to connect four of your tokens in a straight continuous line — horizontally, vertically, or diagonally.',
       },
       {
-        title: 'Draw',
-        description: 'If all 42 slots fill without either player achieving 4-in-a-row, the game is a tie.',
+        title: 'Board Fill',
+        description: 'If all 42 slots are filled without any 4-in-a-row alignment, the game ends in a draw.',
       },
     ],
     tip: 'Control the center column early to maximize your potential 4-in-a-row combinations in all directions.',
@@ -91,37 +88,37 @@ const GAME_RULES: Record<GameId, { subtitle: string; rules: RuleItem[]; tip?: st
     tip: 'Plan your moves to land the final seed in your store repeatedly for free extra turns.',
   },
   nim: {
-    subtitle: 'Ancient mathematical game of stone heaps',
+    subtitle: 'Ancient mathematical game of match heaps',
     rules: [
       {
         title: 'Board Setup',
-        description: 'Starts with 3 heaps containing 3, 4, and 5 stones respectively.',
+        description: 'Starts with 3 heaps containing 3, 4, and 5 matches respectively.',
       },
       {
         title: 'Turn Rule',
-        description: 'On your turn, choose any single non-empty heap and take as many stones as you want (from 1 up to all remaining stones in that heap).',
+        description: 'On your turn, choose any single non-empty heap and take as many matches as you want (from 1 up to all remaining in that heap).',
       },
       {
         title: 'Single Heap Restriction',
-        description: 'You cannot take stones from more than one heap in a single turn.',
+        description: 'You cannot take matches from more than one heap in a single turn.',
       },
       {
         title: 'Normal Play Convention',
-        description: 'The player who takes the very last stone remaining on the board wins the match.',
+        description: 'The player who takes the very last match remaining on the board wins the match.',
       },
     ],
     tip: 'Nim is mathematically solved using binary XOR sums (Nim-sum). Leaving an XOR sum of 0 puts the opponent in a losing position.',
   },
   tictactoe: {
-    subtitle: 'Classic 3×3 alignment game',
+    subtitle: 'Classic 3x3 alignment puzzle',
     rules: [
       {
         title: 'Symbols',
-        description: 'You are X and move first. The Computer is O.',
+        description: 'You are Cinnabar X and move first. The Computer is Slate O.',
       },
       {
         title: 'Placement',
-        description: 'Tap any empty grid square to place your mark.',
+        description: 'Tap any empty grid square to sketch your mark.',
       },
       {
         title: 'Win Condition',
@@ -135,11 +132,11 @@ const GAME_RULES: Record<GameId, { subtitle: string; rules: RuleItem[]; tip?: st
     tip: 'Under optimal play from both players, Tic-Tac-Toe always ends in a draw.',
   },
   reversi: {
-    subtitle: 'Classic 8×8 Othello disc flipping strategy game',
+    subtitle: 'Classic 8x8 Othello disc flipping strategy game',
     rules: [
       {
         title: 'Board Setup',
-        description: 'You play Light (White) discs and move first; the Computer plays Dark (Black). Four discs begin in the center.',
+        description: 'You play Light (Ivory) discs and move first; the Computer plays Dark (Charcoal). Four discs begin in the center.',
       },
       {
         title: 'Outflanking & Flipping',
@@ -181,7 +178,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1f1a15]/75 backdrop-blur-xs animate-fade-in font-['Patrick_Hand',cursive]"
       onClick={() => {
         sounds.playTap();
         onClose();
@@ -191,21 +188,24 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
       aria-labelledby="instructions-modal-title"
     >
       <div
-        className="w-full max-w-lg bg-[#0f0f14] border border-neutral-700/80 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+        className="w-full max-w-lg bg-[#fffdfa] hand-border-thick sketchbook-shadow overflow-hidden flex flex-col max-h-[85vh] relative transform rotate-0.5"
         onClick={e => e.stopPropagation()}
       >
+        {/* Top Washi Tape accent */}
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 bg-[#ecd58e]/95 transform -rotate-1 shadow-sm border-t border-b border-[#c8b26e]/60 pointer-events-none z-20" />
+
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-neutral-800 bg-[#16161f]">
+        <div className="flex items-center justify-between px-5 sm:px-6 pt-5 pb-3 border-b-2 border-dashed border-[#cfc1b0] bg-[#faf6ed]">
           <div className="flex items-center gap-2.5">
-            <BookOpen className="w-5 h-5 text-white" />
+            <BookOpen className="w-5 h-5 text-[#b83320]" />
             <div>
               <h2
                 id="instructions-modal-title"
-                className="text-base font-semibold text-white tracking-wide"
+                className="text-xl sm:text-2xl font-['Caveat',cursive] font-bold text-[#2c241c] tracking-wide"
               >
-                {gameName}
+                {gameName} Field Notes
               </h2>
-              <p className="text-xs text-neutral-400">{gameInfo.subtitle}</p>
+              <p className="text-xs font-mono text-[#786c5e]">{gameInfo.subtitle}</p>
             </div>
           </div>
           <button
@@ -213,29 +213,29 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
               sounds.playTap();
               onClose();
             }}
-            className="p-2 sm:p-1.5 rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer touch-manipulation"
-            aria-label="Close rules"
+            className="p-1 rounded-md text-[#5c5043] hover:text-black hover:bg-[#ede5d6] border border-[#2c241c] transition-colors cursor-pointer touch-manipulation"
+            aria-label="Close field notes"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Rules Content */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-4 text-sm select-text">
-          <div className="space-y-3">
+        <div className="p-5 sm:p-6 overflow-y-auto space-y-3.5 text-sm select-text bg-[#fffdfa]">
+          <div className="space-y-2.5">
             {gameInfo.rules.map((rule, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-3 p-3 rounded-xl bg-[#171722] border border-neutral-700/70"
+                className="flex items-start gap-3 p-3 rounded-lg bg-[#faf6ed] border-2 border-[#2c241c] shadow-[1px_2px_0px_#2c241c]"
               >
-                <div className="w-5 h-5 rounded-full bg-neutral-800 border border-neutral-600 text-[11px] font-mono font-semibold text-white flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-5 h-5 rounded-full bg-[#b83320] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 shadow-xs font-mono">
                   {idx + 1}
                 </div>
                 <div>
-                  <h3 className="text-xs font-semibold text-white uppercase tracking-wider mb-0.5">
+                  <h3 className="text-sm font-bold text-[#2c241c] uppercase tracking-wide mb-0.5 font-['Caveat',cursive] text-base">
                     {rule.title}
                   </h3>
-                  <p className="text-xs text-neutral-200 leading-relaxed">
+                  <p className="text-xs text-[#4a3f33] leading-relaxed">
                     {rule.description}
                   </p>
                 </div>
@@ -244,25 +244,26 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
           </div>
 
           {gameInfo.tip && (
-            <div className="p-3.5 rounded-xl bg-[#1b1b26] border border-neutral-700 text-xs">
-              <span className="font-semibold text-white uppercase tracking-wider text-[10px] block mb-1">
-                Strategy Note
+            <div className="p-3.5 rounded-lg bg-[#fffbe6] border-2 border-dashed border-[#d4b106] text-xs shadow-xs relative">
+              <span className="font-['Caveat',cursive] text-base font-bold text-[#996b00] block mb-0.5">
+                ★ Zine Strategy Tip:
               </span>
-              <p className="text-neutral-300 leading-relaxed">{gameInfo.tip}</p>
+              <p className="text-[#594d26] leading-relaxed italic">{gameInfo.tip}</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-5 sm:px-6 py-3 border-t border-neutral-800 bg-[#14141d] flex justify-end">
+        <div className="px-5 sm:px-6 py-3 border-t-2 border-dashed border-[#cfc1b0] bg-[#faf6ed] flex items-center justify-between">
+          <span className="text-xs font-mono text-[#8a7f72]">Solved Tabletop Zine</span>
           <button
             onClick={() => {
               sounds.playTap();
               onClose();
             }}
-            className="px-5 py-2 sm:py-1.5 rounded-xl bg-white hover:bg-neutral-200 text-black font-semibold text-xs transition-colors cursor-pointer touch-manipulation active:scale-95"
+            className="px-5 py-1 rounded-lg bg-[#2c241c] hover:bg-[#403831] text-[#faf6ee] font-['Patrick_Hand',cursive] font-bold text-sm tracking-wider transition-all cursor-pointer shadow-[2px_2px_0px_#8c4233] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
           >
-            Got it
+            Got It!
           </button>
         </div>
       </div>

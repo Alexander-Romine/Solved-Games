@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { GameId } from '../types';
 import { Volume2, VolumeX, HelpCircle } from 'lucide-react';
 import { sounds } from '../utils/sound';
@@ -20,68 +20,85 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenInstructions,
   gameList,
 }) => {
+  const tapeColors = [
+    'bg-[#edd998]/90', // Yellow washi
+    'bg-[#f0a89a]/90', // Coral washi
+    'bg-[#a9d4bd]/90', // Sage washi
+    'bg-[#a5cde3]/90', // Sky washi
+    'bg-[#e2c1df]/90', // Lilac washi
+    'bg-[#e8cb9b]/90', // Amber washi
+  ];
+
   return (
-    <header className="relative flex items-center justify-between gap-3 sm:gap-6 px-4 sm:px-8 py-3 sm:py-4 min-h-[56px] sm:min-h-[66px] border-b border-neutral-800 bg-black/90 backdrop-blur-md sticky top-0 z-30 select-none">
-      {/* Polished Wordmark */}
-      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-        <span className="text-sm sm:text-lg font-bold tracking-[0.14em] sm:tracking-[0.16em] text-white uppercase font-['Outfit',sans-serif] whitespace-nowrap drop-shadow-[0_1px_8px_rgba(255,255,255,0.25)]">
-          Solved Games
-        </span>
-      </div>
+    <header className="relative w-full px-4 sm:px-8 pt-3 pb-2 z-30 select-none">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b-2 border-dashed border-[#bdaea0] pb-3">
+        {/* Clean Sketchbook Title */}
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <span className="text-2xl sm:text-3xl font-['Caveat',cursive] font-bold text-[#2e261f] tracking-wide inline-block transform -rotate-1">
+              Solved Games
+            </span>
+            
+          </div>
+        </div>
 
-      {/* Navigation Progress Dots - Centered on screen */}
-      <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3.5">
-        {gameList.map((game, idx) => {
-          const isActive = activeGame === game.id;
-          return (
-            <button
-              key={game.id}
-              onClick={() => {
-                sounds.playTap();
-                onSelectGame(game.id);
-              }}
-              className="group relative flex items-center justify-center p-2 sm:p-2 cursor-pointer transition-all touch-manipulation"
-              title={`Game ${idx + 1}`}
-              aria-label={`Go to game ${idx + 1}`}
-            >
-              <div
-                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-200 ${
+        {/* Washi Tape Index Bookmark Tabs */}
+        <nav className="flex items-center flex-wrap justify-center gap-1.5 sm:gap-2.5">
+          {gameList.map((game, idx) => {
+            const isActive = activeGame === game.id;
+            const tapeColor = tapeColors[idx % tapeColors.length];
+
+            return (
+              <button
+                key={game.id}
+                onClick={() => {
+                  sounds.playTap();
+                  onSelectGame(game.id);
+                }}
+                className={`group relative px-2.5 sm:px-3 py-1 rounded-sm cursor-pointer transition-transform touch-manipulation font-['Patrick_Hand',cursive] text-sm sm:text-base ${tapeColor} ${
                   isActive
-                    ? 'bg-white scale-125 shadow-[0_0_8px_rgba(255,255,255,0.95)] ring-2 ring-white/30'
-                    : 'bg-neutral-600 hover:bg-neutral-400'
+                    ? 'scale-105 shadow-[0_2px_4px_rgba(0,0,0,0.25)] font-bold text-[#1f1914] -rotate-1 ring-2 ring-[#2e261f]'
+                    : 'opacity-75 hover:opacity-100 hover:scale-102 text-[#3b3229] rotate-1'
                 }`}
-              />
-              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-neutral-900 text-neutral-200 text-[10px] px-2 py-0.5 rounded border border-neutral-700 pointer-events-none whitespace-nowrap z-40">
-                {isActive ? game.name : `Game ${idx + 1}`}
-              </span>
-            </button>
-          );
-        })}
-      </nav>
+                title={game.name}
+                aria-label={`Go to ${game.name}`}
+              >
+                <span className="text-xs font-mono mr-1 opacity-70">#{idx + 1}</span>
+                <span>{game.name}</span>
+                {isActive && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#b83320] ring-1 ring-white" />
+                )}
+              </button>
+            );
+          })}
+        </nav>
 
-      {/* Right controls */}
-      <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
-        <button
-          onClick={() => {
-            sounds.playTap();
-            onOpenInstructions();
-          }}
-          title="Game Rules & Instructions"
-          className="p-2 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer touch-manipulation"
-          aria-label="Game rules and instructions"
-        >
-          <HelpCircle className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-        </button>
+        {/* Right tools: Rules zine & sound */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              sounds.playTap();
+              onOpenInstructions();
+            }}
+            title="Field Notes & Rules"
+            className="flex items-center gap-1 px-2.5 py-1 text-xs font-['Patrick_Hand',cursive] text-[#3c342b] hover:text-[#181410] bg-[#faf6ee] hover:bg-[#efe7d6] border-2 border-[#3c342b] rounded-lg transition-all cursor-pointer shadow-[2px_2px_0px_#3c342b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            aria-label="Game rules and instructions"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-[#8c4233]" />
+            <span>Rules</span>
+          </button>
 
-        <button
-          onClick={onToggleMute}
-          title={isMuted ? 'Unmute Sound' : 'Mute Sound'}
-          className="p-2 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer touch-manipulation"
-          aria-label={isMuted ? 'Unmute sound' : 'Mute sound'}
-        >
-          {isMuted ? <VolumeX className="w-4 h-4 sm:w-4.5 sm:h-4.5" /> : <Volume2 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />}
-        </button>
+          <button
+            onClick={onToggleMute}
+            title={isMuted ? 'Unmute Sound' : 'Mute Sound'}
+            className="p-1.5 text-[#3c342b] hover:text-[#181410] bg-[#faf6ee] hover:bg-[#efe7d6] border-2 border-[#3c342b] rounded-lg transition-all cursor-pointer shadow-[2px_2px_0px_#3c342b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            aria-label={isMuted ? 'Unmute sound' : 'Mute sound'}
+          >
+            {isMuted ? <VolumeX className="w-3.5 h-3.5 text-[#8c7f70]" /> : <Volume2 className="w-3.5 h-3.5 text-[#2e6940]" />}
+          </button>
+        </div>
       </div>
     </header>
   );
 };
+

@@ -1,21 +1,16 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { AllStats, GameId, GameStats } from './types';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { GameId, AllStats, GameStats } from './types';
 import { Header } from './components/Header';
+import { AmbientBackground } from './components/AmbientBackground';
 import { InstructionsModal } from './components/InstructionsModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
-import { AmbientBackground } from './components/AmbientBackground';
 import { CheckersGame } from './games/checkers/CheckersGame';
 import { Connect4Game } from './games/connect4/Connect4Game';
 import { MancalaGame } from './games/mancala/MancalaGame';
 import { NimGame } from './games/nim/NimGame';
 import { TicTacToeGame } from './games/tictactoe/TicTacToeGame';
 import { ReversiGame } from './games/reversi/ReversiGame';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { sounds } from './utils/sound';
 
 const DEFAULT_STATS: GameStats = {
@@ -48,7 +43,7 @@ export default function App() {
   const [isMuted, setIsMuted] = useState(() => sounds.isMuted());
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
 
-  // Load stats from localStorage (migrating any previous ties into computer wins)
+  // Load stats from localStorage
   const [allStats, setAllStats] = useState<AllStats>(() => {
     try {
       const saved = localStorage.getItem('tabletop_stats_v2');
@@ -76,7 +71,6 @@ export default function App() {
   }, [allStats]);
 
   const handleUpdateStats = (result: 'win' | 'loss' | 'draw') => {
-    // Ties count as wins for the computer
     const isPlayerWin = result === 'win';
 
     setAllStats(prev => {
@@ -114,9 +108,7 @@ export default function App() {
     setActiveGame(EXHIBIT_GAMES[prevIndex].id);
   }, [activeGame]);
 
-  // Keyboard navigation for exhibit hall (Left / Right arrow keys)
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    // Only if not inside an input/textarea
     if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
       return;
     }
@@ -152,7 +144,6 @@ export default function App() {
     if (touchStartXRef.current === null || touchStartYRef.current === null) return;
     const diffX = e.changedTouches[0].clientX - touchStartXRef.current;
     const diffY = e.changedTouches[0].clientY - touchStartYRef.current;
-    // Only trigger if mostly horizontal swipe of at least 50px
     if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
       if (diffX > 0) {
         handlePrevGame();
@@ -165,95 +156,121 @@ export default function App() {
   };
 
   const currentGame = EXHIBIT_GAMES.find(g => g.id === activeGame);
+  const currentIndex = EXHIBIT_GAMES.findIndex(g => g.id === activeGame);
 
   return (
-    <div className="min-h-screen bg-transparent text-neutral-100 flex flex-col relative overflow-hidden">
-      {/* Ambient Animated Monochrome Background */}
+    <div className="min-h-screen text-[#26221c] flex flex-col items-center justify-start p-2 sm:p-6 lg:p-8 relative overflow-x-hidden font-['Patrick_Hand',cursive]">
+      {/* Background craft desk texture */}
       <AmbientBackground />
 
-      {/* Navigation Header */}
-      <Header
-        activeGame={activeGame}
-        onSelectGame={setActiveGame}
-        isMuted={isMuted}
-        onToggleMute={handleToggleMute}
-        onOpenInstructions={() => {
-          sounds.playTap();
-          setIsInstructionsOpen(true);
-        }}
-        gameList={EXHIBIT_GAMES}
-      />
-
-      {/* Main Game Stage - centered on the screen with touch swipe support */}
-      <main
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        className="flex-1 w-full max-w-xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col items-center justify-center"
-      >
-        {activeGame === 'checkers' && (
-          <CheckersGame
-            stats={allStats.checkers}
-            onUpdateStats={handleUpdateStats}
-          />
-        )}
-
-        {activeGame === 'connect4' && (
-          <Connect4Game
-            stats={allStats.connect4}
-            onUpdateStats={handleUpdateStats}
-          />
-        )}
-
-        {activeGame === 'mancala' && (
-          <MancalaGame
-            stats={allStats.mancala}
-            onUpdateStats={handleUpdateStats}
-          />
-        )}
-
-        {activeGame === 'nim' && (
-          <NimGame
-            stats={allStats.nim}
-            onUpdateStats={handleUpdateStats}
-          />
-        )}
-
-        {activeGame === 'tictactoe' && (
-          <TicTacToeGame
-            stats={allStats.tictactoe}
-            onUpdateStats={handleUpdateStats}
-          />
-        )}
-
-        {activeGame === 'reversi' && (
-          <ReversiGame
-            stats={allStats.reversi || DEFAULT_STATS}
-            onUpdateStats={handleUpdateStats}
-          />
-        )}
-
-        {/* Navigation Arrows */}
-        <div className="flex items-center justify-center gap-5 sm:gap-6 mt-3 sm:mt-3.5 select-none">
-          <button
-            onClick={handlePrevGame}
-            className="p-2 sm:p-1.5 rounded-full text-neutral-300 hover:text-white bg-neutral-900/80 sm:bg-transparent border border-neutral-700/80 sm:border-transparent hover:border-neutral-600 transition-colors cursor-pointer group touch-manipulation"
-            title="Previous Game"
-            aria-label="Previous Game"
-          >
-            <ChevronLeft className="w-4 h-4 sm:w-3.5 sm:h-3.5 transition-transform group-hover:-translate-x-0.5 text-neutral-300 group-hover:text-white" />
-          </button>
-          <button
-            onClick={handleNextGame}
-            className="p-2 sm:p-1.5 rounded-full text-neutral-300 hover:text-white bg-neutral-900/80 sm:bg-transparent border border-neutral-700/80 sm:border-transparent hover:border-neutral-600 transition-colors cursor-pointer group touch-manipulation"
-            title="Next Game"
-            aria-label="Next Game"
-          >
-            <ChevronRight className="w-4 h-4 sm:w-3.5 sm:h-3.5 transition-transform group-hover:translate-x-0.5 text-neutral-300 group-hover:text-white" />
-          </button>
+      {/* The Wider Open Sketchbook Folio Container */}
+      <div className="w-full max-w-4xl lg:max-w-5xl bg-[#faf7ef] rounded-2xl border-4 border-[#2c241c] sketchbook-shadow relative flex flex-col my-auto overflow-hidden pb-4">
+        {/* Top Spiral Wire Binding Rings across the wider format */}
+        <div className="w-full bg-[#ede5d5] border-b-2 border-[#2c241c] px-4 py-2 flex items-center justify-between select-none relative">
+          <div className="flex items-center gap-2 sm:gap-3 w-full justify-around">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#2c241c] shadow-inner mb-[-6px] z-10" />
+                <div className="spiral-ring" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#2c241c] shadow-inner mt-[-6px] z-10" />
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
 
-      {/* Game Rules Modal */}
+        
+
+        {/* Notebook Top Header */}
+        <Header
+          activeGame={activeGame}
+          onSelectGame={setActiveGame}
+          isMuted={isMuted}
+          onToggleMute={handleToggleMute}
+          onOpenInstructions={() => {
+            sounds.playTap();
+            setIsInstructionsOpen(true);
+          }}
+          gameList={EXHIBIT_GAMES}
+        />
+
+        {/* Main Sketchbook Page Canvas */}
+        <main
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-8 py-3 sm:py-5 flex flex-col items-center justify-center relative"
+        >
+          {activeGame === 'checkers' && (
+            <CheckersGame
+              stats={allStats.checkers}
+              onUpdateStats={handleUpdateStats}
+            />
+          )}
+
+          {activeGame === 'connect4' && (
+            <Connect4Game
+              stats={allStats.connect4}
+              onUpdateStats={handleUpdateStats}
+            />
+          )}
+
+          {activeGame === 'mancala' && (
+            <MancalaGame
+              stats={allStats.mancala}
+              onUpdateStats={handleUpdateStats}
+            />
+          )}
+
+          {activeGame === 'nim' && (
+            <NimGame
+              stats={allStats.nim}
+              onUpdateStats={handleUpdateStats}
+            />
+          )}
+
+          {activeGame === 'tictactoe' && (
+            <TicTacToeGame
+              stats={allStats.tictactoe}
+              onUpdateStats={handleUpdateStats}
+            />
+          )}
+
+          {activeGame === 'reversi' && (
+            <ReversiGame
+              stats={allStats.reversi || DEFAULT_STATS}
+              onUpdateStats={handleUpdateStats}
+            />
+          )}
+
+          {/* Hand-drawn Page Flipping Navigation */}
+          <div className="flex items-center justify-between w-full max-w-[520px] mt-4 px-2 select-none border-t-2 border-dashed border-[#cfc1b0] pt-2.5">
+            <button
+              onClick={handlePrevGame}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[#2e261f] hover:text-black bg-[#faf6ee] hover:bg-[#efe7d6] border-2 border-[#2e261f] transition-all cursor-pointer shadow-[2px_2px_0px_#2e261f] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none touch-manipulation font-['Patrick_Hand',cursive] text-sm sm:text-base font-bold"
+              title="Previous Game"
+              aria-label="Previous Game"
+            >
+              <ChevronLeft className="w-4 h-4 text-[#8c4233]" />
+              <span>← Prev Page</span>
+            </button>
+            
+            <div className="font-['Caveat',cursive] text-lg text-[#6f6354] transform -rotate-1">
+              • page {currentIndex + 1} of {EXHIBIT_GAMES.length} •
+            </div>
+
+            <button
+              onClick={handleNextGame}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[#2e261f] hover:text-black bg-[#faf6ee] hover:bg-[#efe7d6] border-2 border-[#2e261f] transition-all cursor-pointer shadow-[2px_2px_0px_#2e261f] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none touch-manipulation font-['Patrick_Hand',cursive] text-sm sm:text-base font-bold"
+              title="Next Game"
+              aria-label="Next Game"
+            >
+              <span>Next Page →</span>
+              <ChevronRight className="w-4 h-4 text-[#8c4233]" />
+            </button>
+          </div>
+        </main>
+      </div>
+
+      {/* Game Rules Modal - Folded Pamphlet */}
       <InstructionsModal
         isOpen={isInstructionsOpen}
         onClose={() => setIsInstructionsOpen(false)}
@@ -266,3 +283,4 @@ export default function App() {
     </div>
   );
 }
+
