@@ -90,7 +90,7 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
     if ((winningLine && winningLine.winner === 'O') || isDraw) {
       const timer = setTimeout(() => {
         resetGame();
-      }, 3800);
+      }, 2600);
       return () => clearTimeout(timer);
     }
   }, [winningLine, isDraw, resetGame]);
@@ -193,4 +193,5 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
     </div>
   );
 };
+
 

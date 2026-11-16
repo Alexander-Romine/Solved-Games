@@ -156,7 +156,7 @@ export const CheckersGame: React.FC<CheckersGameProps> = ({ stats, onUpdateStats
     if (winner === 'p2') {
       const timer = setTimeout(() => {
         resetGame();
-      }, 3800);
+      }, 2600);
       return () => clearTimeout(timer);
     }
   }, [winner, resetGame]);
@@ -245,4 +245,5 @@ export const CheckersGame: React.FC<CheckersGameProps> = ({ stats, onUpdateStats
     </div>
   );
 };
+
 

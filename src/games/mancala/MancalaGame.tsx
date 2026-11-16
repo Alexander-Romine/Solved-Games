@@ -275,7 +275,7 @@ export const MancalaGame: React.FC<MancalaGameProps> = ({ stats, onUpdateStats }
     if (state.gameOver && (state.winner === 2 || state.winner === 'tie')) {
       const timer = setTimeout(() => {
         resetGame();
-      }, 3800);
+      }, 2600);
       return () => clearTimeout(timer);
     }
   }, [state.gameOver, state.winner, resetGame]);
@@ -429,4 +429,5 @@ export const MancalaGame: React.FC<MancalaGameProps> = ({ stats, onUpdateStats }
     </div>
   );
 };
+
 

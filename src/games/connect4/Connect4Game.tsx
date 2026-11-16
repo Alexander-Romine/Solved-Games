@@ -96,7 +96,7 @@ export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats
     if ((winningLine && winningLine.player === 2) || isDraw) {
       const timer = setTimeout(() => {
         resetGame();
-      }, 3800);
+      }, 2600);
       return () => clearTimeout(timer);
     }
   }, [winningLine, isDraw, resetGame]);
@@ -240,4 +240,5 @@ export const Connect4Game: React.FC<Connect4GameProps> = ({ stats, onUpdateStats
     </div>
   );
 };
+
 

@@ -114,7 +114,7 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({ stats, onUpdateStats }
     if (gameOver && (winner === 'black' || winner === 'tie')) {
       const timer = setTimeout(() => {
         resetGame();
-      }, 3800);
+      }, 2600);
       return () => clearTimeout(timer);
     }
   }, [gameOver, winner, resetGame]);
@@ -230,4 +230,5 @@ export const ReversiGame: React.FC<ReversiGameProps> = ({ stats, onUpdateStats }
     </div>
   );
 };
+
 

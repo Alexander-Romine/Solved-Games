@@ -83,7 +83,7 @@ export const NimGame: React.FC<NimGameProps> = ({ stats, onUpdateStats }) => {
     if (winner === 2) {
       const timer = setTimeout(() => {
         resetGame();
-      }, 3800);
+      }, 2600);
       return () => clearTimeout(timer);
     }
   }, [winner, resetGame]);
@@ -237,4 +237,5 @@ export const NimGame: React.FC<NimGameProps> = ({ stats, onUpdateStats }) => {
     </div>
   );
 };
+
 
