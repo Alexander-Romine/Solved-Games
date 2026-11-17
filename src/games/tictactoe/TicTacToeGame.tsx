@@ -124,8 +124,6 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
 
       {/* Sketched Graph Paper Sheet */}
       <div className="w-[min(340px,calc(100vw-32px))] sm:w-[440px] md:w-[480px] h-[min(340px,calc(100vw-32px))] sm:h-[440px] md:h-[480px] p-4 sm:p-6 bg-[#fffdfa] hand-border-thick paper-note-shadow flex items-center justify-center select-none relative graph-paper-sketch">
-        {/* Washi tape piece holding top-left corner */}
-        <div className="absolute -top-3 left-6 w-18 h-6 bg-[#ecd58e]/95 washi-tape transform -rotate-6 shadow-md border-t border-b border-[#c8b26e]/60 pointer-events-none z-30" />
 
         {/* Hand-drawn Grid Lines Container */}
         <div className="grid grid-cols-3 grid-rows-3 gap-0 w-full h-full relative">
