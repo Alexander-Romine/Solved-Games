@@ -282,14 +282,14 @@ export const MancalaGame: React.FC<MancalaGameProps> = ({ stats, onUpdateStats }
 
   const getStatusText = () => {
     if (state.gameOver) {
-      if (state.winner === 'tie') return '⚖️ Draw Match';
-      return state.winner === 1 ? '✏️ You won Kalah!' : '💀 Bot won';
+      if (state.winner === 'tie') return 'Draw Match';
+      return state.winner === 1 ? 'You won Kalah!' : 'Bot won!';
     }
     if (isAnimating && handSeeds !== null) {
-      return `🖐️ Sowing (${handSeeds} in hand)`;
+      return '';
     }
-    if (activeNotification) return `⚡ ${activeNotification}`;
-    return state.currentPlayer === 1 ? '✏️ Pick a pit to sow' : '⌛ Bot Thinking...';
+    if (activeNotification) return activeNotification;
+    return '';
   };
 
   return (
@@ -429,5 +429,6 @@ export const MancalaGame: React.FC<MancalaGameProps> = ({ stats, onUpdateStats }
     </div>
   );
 };
+
 
 
