@@ -85,7 +85,7 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
     return () => clearTimeout(timer);
   }, [currentPlayer, board, winningLine, isDraw, makeMove]);
 
-  // Auto-refresh after 2.6s on loss or draw so the user can inspect the final board
+  // Auto-refresh after ~3.8s on loss or draw so the user can inspect the final board
   useEffect(() => {
     if ((winningLine && winningLine.winner === 'O') || isDraw) {
       const timer = setTimeout(() => {
@@ -108,7 +108,7 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
     if (winningLine) {
       return winningLine.winner === 'X' ? 'You Won!' : 'Bot Won!';
     }
-    if (isDraw) return "Cat's Game (Draw)";
+    if (isDraw) return 'Cat’s Game (Draw)';
     return '';
   };
 
@@ -122,13 +122,19 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
         onResetGame={resetGame}
       />
 
-      {/* Sketched Backing Sheet */}
-      <div className="w-[min(340px,calc(100vw-32px))] sm:w-[440px] md:w-[480px] h-[min(340px,calc(100vw-32px))] sm:h-[440px] md:h-[480px] p-3.5 sm:p-5 bg-[#faf6ee] hand-border-thick paper-note-shadow flex items-center justify-center select-none relative graph-paper-sketch">
-        {/* Washi tape piece going OVER the top of the post-it note */}
-        <div className="absolute -top-4 sm:-top-5 left-8 sm:left-12 w-28 sm:w-32 h-7 sm:h-8 bg-[#eed788]/95 washi-tape transform -rotate-2 z-30 shadow-md border-t border-b border-[#cca845]/50 pointer-events-none" />
+      {/* Sketched Graph Paper Sheet */}
+      <div className="w-[min(340px,calc(100vw-32px))] sm:w-[440px] md:w-[480px] h-[min(340px,calc(100vw-32px))] sm:h-[440px] md:h-[480px] p-4 sm:p-6 bg-[#fffdfa] hand-border-thick paper-note-shadow flex items-center justify-center select-none relative overflow-hidden graph-paper-sketch">
+        {/* Washi tape piece holding top-left corner */}
+        <div className="absolute -top-3 left-6 w-16 h-5 bg-[#ecd58e]/90 transform -rotate-6 shadow-xs border-t border-b border-[#c8b26e]/50 pointer-events-none" />
 
-        {/* 3x3 Grid of Light Yellow Post-it Squares */}
-        <div className="grid grid-cols-3 grid-rows-3 gap-2.5 sm:gap-3.5 w-full h-full relative z-10">
+        {/* Hand-drawn Grid Lines Container */}
+        <div className="grid grid-cols-3 grid-rows-3 gap-0 w-full h-full relative">
+          {/* Subtle hand-drawn dividing lines */}
+          <div className="absolute left-1/3 top-1 bottom-1 w-0.5 bg-[#3a3026] transform -rotate-0.5" />
+          <div className="absolute left-2/3 top-1 bottom-1 w-0.5 bg-[#3a3026] transform rotate-0.5" />
+          <div className="absolute top-1/3 left-1 right-1 h-0.5 bg-[#3a3026] transform rotate-0.5" />
+          <div className="absolute top-2/3 left-1 right-1 h-0.5 bg-[#3a3026] transform -rotate-0.5" />
+
           {board.map((cell, idx) => {
             const isWinner = isWinningCell(idx);
             const isClickable = cell === null && !winningLine && !isDraw && currentPlayer === 'X';
@@ -138,13 +144,11 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
                 key={idx}
                 onClick={() => handleCellClick(idx)}
                 disabled={!isClickable}
-                className={`w-full h-full relative flex items-center justify-center touch-manipulation z-10 transition-all rounded-md sm:rounded-lg border-2 border-[#2c241c] shadow-[2px_2px_0px_#2c241c] ${
-                  isWinner
-                    ? 'bg-[#fde047] ring-2 ring-[#b83320] scale-[1.02]'
-                    : 'bg-[#fef9c3]'
+                className={`w-full h-full relative flex items-center justify-center touch-manipulation z-10 transition-colors ${
+                  isWinner ? 'bg-[#ffeedd]/70' : ''
                 } ${
                   isClickable
-                    ? 'cursor-pointer hover:bg-[#fef08a] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#2c241c] active:translate-y-0 active:shadow-[1px_1px_0px_#2c241c]'
+                    ? 'cursor-pointer hover:bg-[#ebd9bd]/25'
                     : 'cursor-default'
                 }`}
                 aria-label={`Grid cell ${idx}`}
@@ -189,3 +193,5 @@ export const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ stats, onUpdateSta
     </div>
   );
 };
+
+
